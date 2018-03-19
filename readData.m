@@ -227,12 +227,12 @@ end
 tline = fgetl(fileID);
 tmp = strsplit(tline);
 name = tmp{2}; % value to assign
-if strcmp(name,'RelativeNorm')
+if strcmp(name,'AbsoluteNorm')
     optNorm = 1;
-elseif strcmp(name,'AbsoluteNorm')
-    error('Modified Newton not implemented yet')
+elseif strcmp(name,'RelativeNorm')
+    error('RelativeNorm not implemented yet')
 else
-    warning('Using relative norm!')
+    warning('Using absolute norm!')
     optNorm = 1;
 end
 tline = fgetl(fileID);

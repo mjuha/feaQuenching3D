@@ -1,4 +1,4 @@
-PROBLEM NAME: Elasticity 2D
+PROBLEM NAME: Transient heat 3D
 
 DISCRETIZATION
 Mesh Input File: C:\Users\marioju\Documents\MATLAB\cylinder.msh
@@ -12,9 +12,9 @@ Node Set Association: 0
 Temperature BCs: 0
 DBC on NS bottom for DOF T: 0.0
 Convection BCs: 1
-NBC on SS convLoad for convection: 525.0 50.0
+NBC on SS convLoad for convection: 525.0 70.0
 Heat Flux BCs: 0
-HFC on NS pointLoad for heatflux: 1.0
+HFC on NS pointLoad for heatflux: 0.0
 
 INITIAL CONDITION
 Function: Constant
@@ -22,15 +22,15 @@ Temperature: 200.0
 
 TIME STEPPING
 Delta Time: 1.0
-Final time: 1.0
+Final time: 60.0
 Method: Trapezoidal rule
-Output each n-steps: 1
+Output each n-steps: 5
 
 NONLINEAR OPTIONS
 Newton: Full
-Tolerance: RelativeNorm
-Value: 1e-10
-Max Num Iteration: 12
+Tolerance: AbsoluteNorm
+Value: 1e-6
+Max Num Iteration: 6
 
 MATERIAL PROPERTIES 1
 Name: mat1
