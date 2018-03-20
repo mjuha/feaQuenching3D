@@ -89,8 +89,8 @@ for i = 1:length(w)
     Ts = Nshape * de;
     
     if ~isFluxLoad
-        fe = fe - Nshape' * ( (h+Ts) * ( Ta - Ts ) ) * w(i) * jac;
-        ke = ke + Nshape' * (h+Ts) * Nshape * w(i) * jac;
+        fe = fe - Nshape' * ( h * ( Ta - Ts ) ) * w(i) * jac;
+        ke = ke + Nshape' * h * Nshape * w(i) * jac;
     else
         fe = fe - Nshape' * q * w(i) * jac;
         %ke = zeros(4,4);
