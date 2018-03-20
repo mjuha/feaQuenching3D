@@ -23,6 +23,8 @@ for i=1:m
             value = DBCSet{row(j),3};
             if value(1) == 1
                 val = TLinear(t,value(2),value(3),TS{2});
+            elseif value(1) == 2
+                val = TTable(t);
             end
             U(1,triNode(i,2:4)) = val;       
         end

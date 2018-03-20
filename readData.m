@@ -1,7 +1,7 @@
 function outfile = readData(filename)
 
 % global variables
-global DBCSet HFCSet NBCSet TS MAT isTimeDBC nodeSet NLOPT
+global DBCSet HFCSet NBCSet TS MAT isTimeDBC nodeSet NLOPT TTableData
 
 % Open file
 fileID = fopen(filename,'r');
@@ -106,11 +106,19 @@ else
             f = tmp{8};            
             if strcmp(f,'Linear')
                 val = 1;
+                value = [ val, str2double(tmp(9)), str2double(tmp(10)) ];
+                DBCSet(i,:) = {name, 'TFunction' ,value};
+            elseif strcmp(f,'Table')
+                val = 2;
+                tableName = tmp{9};
+                TTableData = csvread(tableName);
+                value = [ val, str2double(tmp(10)) ];
+                DBCSet(i,:) = {name, 'TFunction' ,value};
             else
-                error('Function must be Linear');
+                error('Function must be Linear or Table');
             end
-            value = [ val, str2double(tmp(9)), str2double(tmp(10)) ];
-            DBCSet(i,:) = {name, 'TFunction' ,value};
+%             value = [ val, str2double(tmp(9)), str2double(tmp(10)) ];
+%             DBCSet(i,:) = {name, 'TFunction' ,value};
             isTimeDBC = true;
         else
             error('DOF must be T or TFunction, please check')
