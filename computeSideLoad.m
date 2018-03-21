@@ -1,6 +1,6 @@
 function [ke,fe] = computeSideLoad(el,xe,de,isFluxLoad)
 
-global convectionLoad fluxLoad
+global convectionLoad fluxLoad HTableData isNBCTempDependent
 
 % Gauss - Legendre rule
 gp = [1/3, 1/3];
@@ -16,7 +16,9 @@ w = 0.5;
 % compute residual: side loads
 if ~isFluxLoad
     face = convectionLoad(el,2);
-    h = convectionLoad(el,6); % coefficient
+    if ~isNBCTempDependent
+        h = convectionLoad(el,6); % coefficient
+    end
     Ta = convectionLoad(el,7); % ambient temperature
 else
     face = fluxLoad(el,2);
@@ -88,6 +90,10 @@ for i = 1:length(w)
     % surface temperature
     Ts = Nshape * de;
     
+    if isNBCTempDependent
+        h = interp1(HTableData(:,1), HTableData(:,2), Ts, 'linear', 0.0);
+    end
+
     if ~isFluxLoad
         fe = fe - Nshape' * ( h * ( Ta - Ts ) ) * w(i) * jac;
         ke = ke + Nshape' * h * Nshape * w(i) * jac;
