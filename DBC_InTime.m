@@ -21,15 +21,14 @@ for i=1:m
         dof = DBCSet{row(j),2};   
         if strcmp(dof,'TFunction')
             value = DBCSet{row(j),3};
-            if value(1) == 1
+            if value(1) == 1 % linear function
                 val = TLinear(t,value(2),value(3),TS{2});
-            elseif value(1) == 2
+            elseif value(1) == 2 % data table
                 val = TTable(t);
             end
             U(1,triNode(i,2:4)) = val;       
         end
     end
 end
-
 
 end
