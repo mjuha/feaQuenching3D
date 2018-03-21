@@ -83,7 +83,6 @@ while ( newtonIter <= maxNumIter )
             U(2,r) = U(2,r) + F(i_index);
         end
     end
-    newtonIter = newtonIter + 1;
     % compute residual norm using new values
     normF = computeF();
     %         fprintf('  Norm of residual old: %g\n', oldNormF)
@@ -92,6 +91,7 @@ while ( newtonIter <= maxNumIter )
         fprintf('  Solution converged!\n')
         break
     end
+    newtonIter = newtonIter + 1;
 end % newtonIter
 if newtonIter > maxNumIter
     error('Does not converge after max number of iterations!')
