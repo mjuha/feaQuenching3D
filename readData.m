@@ -150,7 +150,7 @@ else
             f = tmp{7};            
             if strcmp(f,'Table')
                 tableName = tmp{8};
-                val = str2double(tmp(8)); % ambient temperature
+                val = str2double(tmp(9)); % ambient temperature
                 value = [ 1, val ];
                 HTableData = csvread(tableName);
                 NBCSet(i,:) = {name, 'Fconvection' ,value};

@@ -100,7 +100,7 @@ if row > 0
         for j=1:length(row)
             dof = NBCSet{row(j),2};
             convectionLoad(count,3:5) = triNode(i,2:4);
-            if strcmp(dof,'T')
+            if strcmp(dof,'convection')
                 value = NBCSet{row(j),3};
                 coeff = value(1);
                 value = value(2);

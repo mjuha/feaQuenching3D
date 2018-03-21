@@ -25,7 +25,6 @@ else
     q = fluxLoad(el,6); % heat flux
 end
 
-
 fe = zeros(4,1);
 ke = zeros(4,4);
 % loop over gauss points
@@ -91,7 +90,7 @@ for i = 1:length(w)
     Ts = Nshape * de;
     
     if isNBCTempDependent
-        h = interp1(HTableData(:,1), HTableData(:,2), Ts, 'linear', 0.0);
+        h = interp1(HTableData(:,1), HTableData(:,2), Ts);
     end
 
     if ~isFluxLoad
