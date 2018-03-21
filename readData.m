@@ -2,6 +2,7 @@ function outfile = readData(filename)
 
 % global variables
 global DBCSet HFCSet NBCSet TS MAT isTimeDBC nodeSet NLOPT TTableData
+global HTableData isNBCTempDependent
 
 % Open file
 fileID = fopen(filename,'r');
@@ -112,7 +113,7 @@ else
                 val = 2;
                 tableName = tmp{9};
                 TTableData = csvread(tableName);
-                value = [ val, str2double(tmp(10)) ];
+                value = [ val, 0.0 ];
                 DBCSet(i,:) = {name, 'TFunction' ,value};
             else
                 error('Function must be Linear or Table');
@@ -137,13 +138,32 @@ else
         tline = fgetl(fileID);
         tmp = strsplit(tline);
         name = tmp{4};
-        dof = sscanf(tmp{6},'%[convection]');
-        if ~strcmp(dof,'convection')
-            error('NBC must be convection, please check')
+        dof = sscanf(tmp{6},'%[Fconvection]');
+        if strcmp(dof,'convection')
+            % value to assign to film coefficient
+            coeff = str2double(tmp(7)); % value to assign to film coefficient
+            val = str2double(tmp(8)); % ambient temperature
+            value = [ coeff, val ]; % ambient temperature
+            NBCSet(i,:) = {name, 'convection', value};
+            isNBCTempDependent = false;
+        elseif strcmp(dof,'Fconvection')
+            f = tmp{7};            
+            if strcmp(f,'Table')
+                tableName = tmp{8};
+                val = str2double(tmp(8)); % ambient temperature
+                value = [ 1, val ];
+                HTableData = csvread(tableName);
+                NBCSet(i,:) = {name, 'Fconvection' ,value};
+            else
+                error('Function must be Table');
+            end
+            isNBCTempDependent = true;
+        else
+            error('NBC must be convection or Fconvection, please check')
         end
-        coeff = str2double(tmp(7)); % value to assign to film coefficient
-        value = str2double(tmp(8)); % ambient temperature
-        NBCSet(i,:) = {name, coeff, value};
+%         coeff = str2double(tmp(7)); % value to assign to film coefficient
+%         value = str2double(tmp(8)); % ambient temperature
+%         NBCSet(i,:) = {name, coeff, value};
     end
 end
 % read heat flux BCs
