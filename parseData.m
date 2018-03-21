@@ -106,7 +106,7 @@ if row > 0
                 value = value(2);
                 convectionLoad(count,6) = coeff;
                 convectionLoad(count,7) = value;
-            else strcmp(dof,'Fconvection')
+            elseif strcmp(dof,'Fconvection')
                 value = NBCSet{row(j),3};
                 convectionLoad(count,6) = 0; % temperature dependent
                 convectionLoad(count,7) = value(2); % ambient temperature
@@ -117,7 +117,6 @@ if row > 0
 else
     convectionLoad = [];
 end
-
 
 % find element where convection is applied
 [m,~] = size(convectionLoad);
