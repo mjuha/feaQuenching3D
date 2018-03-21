@@ -98,11 +98,19 @@ if row > 0
         % find in NBCSet first
         [row,~] = find(strcmp(NBCSet,name),3);
         for j=1:length(row)
-            coeff = NBCSet{row(j),2};
-            value = NBCSet{row(j),3};
+            dof = NBCSet{row(j),2};
             convectionLoad(count,3:5) = triNode(i,2:4);
-            convectionLoad(count,6) = coeff;
-            convectionLoad(count,7) = value;
+            if strcmp(dof,'T')
+                value = NBCSet{row(j),3};
+                coeff = value(1);
+                value = value(2);
+                convectionLoad(count,6) = coeff;
+                convectionLoad(count,7) = value;
+            else strcmp(dof,'Fconvection')
+                value = NBCSet{row(j),3};
+                convectionLoad(count,6) = 0; % temperature dependent
+                convectionLoad(count,7) = value(2); % ambient temperature
+            end
             count = count + 1;
         end
     end
