@@ -15,10 +15,8 @@ w = 1/6;
 % w = (1/6)*[0.25 0.25 0.25 0.25];
 
 % get material properties
-prop = cell2mat(MAT(matNum));
-rho = prop(1); % density
-cp = prop(2); % heat capacity
-k = prop(3); % conductivity
+%prop = cell2mat(MAT(matNum));
+prop = MAT(matNum);
 
 ke = zeros(4,4);
 me = zeros(4,4);
@@ -27,6 +25,10 @@ for i = 1:length(w)
     B = zeros(3,4);
     % loop over gauss points
     [N,dN,jac] = shape(gp(i,:),xe);
+    % compute temperature
+    T = N * de;
+    % compute properties
+    [ rho, k, cp ] = ComputeProperties( T, prop );
     for j=1:4 % loop over local nodes
         B(:,j) = dN(j,:);
     end

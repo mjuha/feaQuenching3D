@@ -2,7 +2,10 @@ function outfile = readData(filename)
 
 % global variables
 global DBCSet HFCSet NBCSet TS MAT isTimeDBC nodeSet NLOPT TTableData
-global HTableData isNBCTempDependent
+global HTableData isNBCTempDependent 
+
+% global rhoDataAust rhoDataPer rhoDataMar 
+% global cpDataAust cpDataPer tauData kappaDataAust kappaDataPer kappaDataMar
 
 % Open file
 fileID = fopen(filename,'r');
@@ -287,19 +290,39 @@ for i=1:nmat
         error('Verify material set association, name not found')
     end
     nameKey(i) = matSet(name);
-    % density
+    % data
     tline = fgetl(fileID);
     tmp = strsplit(tline);
-    rho = str2double(tmp(2));
-    % heat capacity
-    tline = fgetl(fileID);
-    tmp = strsplit(tline);
-    cp = str2double(tmp(3));
-    % conductivity
-    tline = fgetl(fileID);
-    tmp = strsplit(tline);
-    k = str2double(tmp(2));
-    prop1 = [rho cp k];
+    if strcmp(tmp(2),'S1080')
+        % read rho austenite
+        s = strcat(pwd,'\data\S1080\densityAustenite.csv');
+        rhoDataAust =  csvread(s);
+        % read rho perlite
+        s = strcat(pwd,'\data\S1080\densityPerlite.csv');
+        rhoDataPer =  csvread(s);
+        % read cp austenite
+        s = strcat(pwd,'\data\S1080\specificHeatAustenite.csv');
+        cpDataAust =  csvread(s);
+        % read cp perlite
+        s = strcat(pwd,'\data\S1080\specificHeatPerlite.csv');
+        cpDataPer =  csvread(s);
+        % read thermal conductivity austenite
+        s = strcat(pwd,'\data\S1080\thermalConductivityAustenite.csv');
+        kappaDataAust =  csvread(s);
+        % read thermal conductivity perlite
+        s = strcat(pwd,'\data\S1080\thermalConductivityPerlite.csv');
+        kappaDataPer =  csvread(s);
+        % read thermal conductivity martensite
+        s = strcat(pwd,'\data\S1080\thermalConductivityAustenite.csv');
+        kappaDataMar =  csvread(s);
+        % read temperature transformation data
+        s = strcat(pwd,'\data\S1080\tempData.csv');
+        tempData =  csvread(s);
+    else
+        error('Only data for AISI 1080 is available!')
+    end
+    prop1 = {rhoDataAust, rhoDataPer, cpDataAust, cpDataPer, ...
+        kappaDataAust, kappaDataPer, kappaDataMar, tempData};
     propKey(i) = {prop1};
     MAT = containers.Map(nameKey,propKey);
 end
