@@ -88,7 +88,7 @@ for i=1:nelT
     end
 end
 %
-clearvars elementsT
+clear elementsT
 
 fprintf('************************\n')
 fprintf('Preparing data structures and printing initial mesh\n')

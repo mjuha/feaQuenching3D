@@ -13,7 +13,7 @@ function feaQuenching3D(filename,varargin)
 %clearvars
 
 global nel neq nzmax coordinates U elements nn LM irow icol ID TS isTimeDBC
-global NLOPT
+global NLOPT Phase
 
 % Specify file name
 %filename = '\\Client\C$\Users\marioju\Documents\Work\valvula\example.inp';
@@ -32,18 +32,22 @@ fprintf('************************\n')
 fprintf('Reading input data\n')
 fprintf('************************\n\n')
 outfile = readData(filename);
+fflush(stdout);
 
 % at time = 0
 Tolerance = NLOPT(3);
 maxNumIter = NLOPT(4);
 fprintf('\nComputing time %f\n\n',0)
+fflush(stdout);
 if isTimeDBC
     DBC_InTime(0)
 end
+dt = TS{1}; % delta time
 % Newton start here
 newtonIter = 1;
 while ( newtonIter <= maxNumIter )
     fprintf('  Computing iteration %d\n\n',newtonIter)
+    fflush(stdout);
     % ===========================
     % assembling stiffness matrix
     % ===========================
@@ -55,8 +59,10 @@ while ( newtonIter <= maxNumIter )
         xe = coordinates(elements(i,2:5),:);
         de = U(1,elements(i,2:5));
         ae = U(2,elements(i,2:5));
+        % get phases on element´s nodes
+        pe = Phase(:,elements(i,2:5));
         matNum = elements(i,1); % element material number
-        [fe,me,~] = weakform(i,xe,de',ae',matNum);
+        [fe,me,~] = weakform(i,xe,de',ae',pe,matNum);
         for k=1:4
             i_index = LM(k,i);
             if (i_index > 0)
@@ -74,6 +80,7 @@ while ( newtonIter <= maxNumIter )
     fprintf('\n')
     fprintf('Solving system of equations\n')
     fprintf('\n')
+    fflush(stdout);
     M = sparse(irow,icol,K,neq,neq);
     F = M\F;
     % assign solution
@@ -87,8 +94,10 @@ while ( newtonIter <= maxNumIter )
     normF = computeF();
     %         fprintf('  Norm of residual old: %g\n', oldNormF)
     fprintf('  Norm of residual: %g\n', normF)
+    fflush(stdout);
     if normF < Tolerance
         fprintf('  Solution converged!\n')
+        fflush(stdout);
         break
     end
     newtonIter = newtonIter + 1;
@@ -96,6 +105,8 @@ end % newtonIter
 if newtonIter > maxNumIter
     error('Does not converge after max number of iterations!')
 end
+% now compute phases
+phaseTransformation(dt)
 WriteVTKFile(outfile,0)
 
 % fprintf('************************\n')
@@ -104,9 +115,9 @@ WriteVTKFile(outfile,0)
 fprintf('************************\n')
 fprintf('Advancing in time\n')
 fprintf('************************\n\n')
+fflush(stdout);
 %
 t = 0;
-dt = TS{1}; % delta time
 tf = TS{2}; % final time
 alpha = TS{3}; % method
 nts = TS{4}; % ouput every nts
@@ -121,6 +132,7 @@ while ( t < tf )
     counter = counter + 1;
     t = t + dt;
     fprintf('\nComputing time %f\n\n',t)
+    fflush(stdout);
     if isTimeDBC
         DBC_InTime(t)
     end
@@ -133,6 +145,7 @@ while ( t < tf )
     newtonIter = 1;
     while ( newtonIter <= maxNumIter )
         fprintf('  Computing iteration %d\n\n',newtonIter)
+        fflush(stdout);
         % ===========================
         % assembling stiffness matrix
         % ===========================
@@ -144,8 +157,10 @@ while ( t < tf )
             xe = coordinates(elements(i,2:5),:);
             de = U(1,elements(i,2:5));
             ae = U(2,elements(i,2:5));
+            % get phases on element´s nodes
+            pe = Phase(:,elements(i,2:5));
             matNum = elements(i,1); % element material number
-            [fe,me,ke] = weakform(i,xe,de',ae',matNum);
+            [fe,me,ke] = weakform(i,xe,de',ae',pe,matNum);
             for k=1:4
                 i_index = LM(k,i);
                 if (i_index > 0)
@@ -163,6 +178,7 @@ while ( t < tf )
         fprintf('\n')
         fprintf('Solving system of equations\n')
         fprintf('\n')
+        fflush(stdout);
         M = sparse(irow,icol,K,neq,neq);
         F = M\F;
         % assign solution
@@ -178,11 +194,18 @@ while ( t < tf )
         % compute residual norm using new values
         normF = computeF();
         fprintf('  Norm of residual: %g\n', normF)
+        fflush(stdout);
         if normF < Tolerance
             fprintf('  Solution converged!\n')
+            fflush(stdout);
             break
         end
     end % newtonIter
+    % now compute phases
+    fprintf('\n')
+    fprintf('Computing phases\n')
+    fflush(stdout);
+    phaseTransformation(dt)
     if mod(counter,nts) == 0
         count1 = count1 + 1;
         WriteVTKFile(outfile,count1)

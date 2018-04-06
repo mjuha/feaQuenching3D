@@ -24,7 +24,8 @@ function WriteVTKFile( outfiledest,istep  )
 %
 % =====================================================================
 
-global coordinates elements nn nel U
+global coordinates elements nn nel U Phase
+
 
 if istep < 10
     % file name
@@ -64,6 +65,24 @@ fprintf(fid, 'SCALARS T float 1\n');
 fprintf(fid, 'LOOKUP_TABLE default\n');
 for i=1:nn
     fprintf(fid, '%g\n',U(1,i));
+end
+%
+fprintf(fid, 'SCALARS Austenite float 1\n');
+fprintf(fid, 'LOOKUP_TABLE default\n');
+for i=1:nn
+    fprintf(fid, '%g\n',Phase(1,i));
+end
+%
+fprintf(fid, 'SCALARS Perlite float 1\n');
+fprintf(fid, 'LOOKUP_TABLE default\n');
+for i=1:nn
+    fprintf(fid, '%g\n',Phase(2,i));
+end
+%
+fprintf(fid, 'SCALARS Martensite float 1\n');
+fprintf(fid, 'LOOKUP_TABLE default\n');
+for i=1:nn
+    fprintf(fid, '%g\n',Phase(3,i));
 end
 % fprintf(fid, '%s %d\n', 'CELL_DATA ', nel);
 % fprintf(fid, 'TENSORS Stress float\n');

@@ -1,13 +1,15 @@
 function [ normF ] = computeF
-global neq nel coordinates elements LM U
+global neq nel coordinates elements LM U Phase
 
 F = zeros(neq,1);
 for i=1:nel
     xe = coordinates(elements(i,2:5),:);
     de = U(1,elements(i,2:5));
     ae = U(2,elements(i,2:5));
+    % get phases on element´s nodes
+    pe = Phase(:,elements(i,2:5));
     matNum = elements(i,1); % element material number
-    [fe,~,~] = weakform(i,xe,de',ae',matNum);
+    [fe,~,~] = weakform(i,xe,de',ae',pe,matNum);
     for k=1:4
         i_index = LM(k,i);
         if (i_index > 0)

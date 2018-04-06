@@ -1,4 +1,4 @@
-function [fe,me,ke] = weakform(el,xe,de,ae,matNum)
+function [fe,me,ke] = weakform(el,xe,de,ae,pe,matNum)
 
 global convectionLoad MAT fluxLoad
 
@@ -16,7 +16,7 @@ w = 1/6;
 
 % get material properties
 %prop = cell2mat(MAT(matNum));
-prop = MAT(matNum);
+prop = MAT(matNum,:);
 
 ke = zeros(4,4);
 me = zeros(4,4);
@@ -27,8 +27,10 @@ for i = 1:length(w)
     [N,dN,jac] = shape(gp(i,:),xe);
     % compute temperature
     T = N * de;
+    % interpolate phases
+    phi = [ dot(N,pe(1,:)); dot(N,pe(2,:)); dot(N,pe(3,:)) ];
     % compute properties
-    [ rho, k, cp ] = ComputeProperties( T, prop );
+    [ rho, k, cp ] = ComputeProperties( T, prop, phi );
     for j=1:4 % loop over local nodes
         B(:,j) = dN(j,:);
     end

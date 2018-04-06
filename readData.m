@@ -2,7 +2,7 @@ function outfile = readData(filename)
 
 % global variables
 global DBCSet HFCSet NBCSet TS MAT isTimeDBC nodeSet NLOPT TTableData
-global HTableData isNBCTempDependent 
+global HTableData isNBCTempDependent
 
 % global rhoDataAust rhoDataPer rhoDataMar 
 % global cpDataAust cpDataPer tauData kappaDataAust kappaDataPer kappaDataMar
@@ -46,18 +46,19 @@ end
 tline = fgetl(fileID);
 tmp = strsplit(tline);
 nms = str2double(tmp(4)); % number of material sets to read
-keySet = cell(1,nms);
-valueSet = zeros(1,nms);
+if nms ~= 1
+    error('Only one material is permitted!')
+end
+matSet = cell(nms,2);
 if nms == 0
     fgetl(fileID); % dummy line
 else
     for i=1:nms
         tline = fgetl(fileID);
         tmp = strsplit(tline);
-        keySet(i) = tmp(2); % physical name
-        valueSet(i) = str2double(tmp(1)); % physical entity number
+        phyN = str2double(tmp(1)); % physical entity number
+        matSet(i,:) = {phyN, tmp{2}}; 
     end
-    matSet = containers.Map(keySet,valueSet);
 end
 % get side set association
 tline = fgetl(fileID);
@@ -280,16 +281,19 @@ fgetl(fileID);
 tline = fgetl(fileID);
 tmp = strsplit(tline);
 nmat = str2double(tmp(3)); % number of materials
-propKey = cell(1,nmat);
-nameKey = zeros(1,nmat);
+if nmat ~= 1
+    error('Only one material is permitted!')
+end
+%propKey = cell(1,nmat);
+%nameKey = zeros(1,nmat);
+MAT = cell(nms,10);
 for i=1:nmat
     tline = fgetl(fileID);
     tmp = strsplit(tline);
     name = tmp{2};
-    if ~isKey(matSet,name)
-        error('Verify material set association, name not found')
+    if ~strcmp(name,matSet{i,2})
+      error('Material does not match!')
     end
-    nameKey(i) = matSet(name);
     % data
     tline = fgetl(fileID);
     tmp = strsplit(tline);
@@ -318,13 +322,19 @@ for i=1:nmat
         % read temperature transformation data
         s = strcat(pwd,'\data\S1080\tempData.csv');
         tempData =  csvread(s);
+        % read IT data
+        s = strcat(pwd,'\data\S1080\tauS.csv');
+        tauSData = csvread(s);
+        s = strcat(pwd,'\data\S1080\tauF.csv');
+        tauFData = csvread(s);
     else
         error('Only data for AISI 1080 is available!')
     end
-    prop1 = {rhoDataAust, rhoDataPer, cpDataAust, cpDataPer, ...
-        kappaDataAust, kappaDataPer, kappaDataMar, tempData};
-    propKey(i) = {prop1};
-    MAT = containers.Map(nameKey,propKey);
+    MAT(i,:) = {rhoDataAust, rhoDataPer, cpDataAust, cpDataPer, ...
+        kappaDataAust, kappaDataPer, kappaDataMar, tempData, ...
+        tauSData, tauFData};
+%    propKey(i) = {prop1};
+    %MAT = containers.Map(nameKey,propKey);
 end
 
 fclose(fileID);
