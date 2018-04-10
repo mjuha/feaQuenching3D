@@ -32,13 +32,11 @@ fprintf('************************\n')
 fprintf('Reading input data\n')
 fprintf('************************\n\n')
 outfile = readData(filename);
-fflush(stdout);
 
 % at time = 0
 Tolerance = NLOPT(3);
 maxNumIter = NLOPT(4);
 fprintf('\nComputing time %f\n\n',0)
-fflush(stdout);
 if isTimeDBC
     DBC_InTime(0)
 end
@@ -46,8 +44,7 @@ dt = TS{1}; % delta time
 % Newton start here
 newtonIter = 1;
 while ( newtonIter <= maxNumIter )
-    fprintf('  Computing iteration %d\n\n',newtonIter)
-    fflush(stdout);
+    fprintf('  Computing iteration %d\n',newtonIter)
     % ===========================
     % assembling stiffness matrix
     % ===========================
@@ -80,7 +77,6 @@ while ( newtonIter <= maxNumIter )
     fprintf('\n')
     fprintf('Solving system of equations\n')
     fprintf('\n')
-    fflush(stdout);
     M = sparse(irow,icol,K,neq,neq);
     F = M\F;
     % assign solution
@@ -93,11 +89,9 @@ while ( newtonIter <= maxNumIter )
     % compute residual norm using new values
     normF = computeF();
     %         fprintf('  Norm of residual old: %g\n', oldNormF)
-    fprintf('  Norm of residual: %g\n', normF)
-    fflush(stdout);
+    fprintf('  Norm of residual: %g\n\n', normF)
     if normF < Tolerance
         fprintf('  Solution converged!\n')
-        fflush(stdout);
         break
     end
     newtonIter = newtonIter + 1;
@@ -106,6 +100,8 @@ if newtonIter > maxNumIter
     error('Does not converge after max number of iterations!')
 end
 % now compute phases
+fprintf('\n')
+fprintf('Computing phases\n\n')
 phaseTransformation(dt)
 WriteVTKFile(outfile,0)
 
@@ -115,7 +111,6 @@ WriteVTKFile(outfile,0)
 fprintf('************************\n')
 fprintf('Advancing in time\n')
 fprintf('************************\n\n')
-fflush(stdout);
 %
 t = 0;
 tf = TS{2}; % final time
@@ -132,7 +127,6 @@ while ( t < tf )
     counter = counter + 1;
     t = t + dt;
     fprintf('\nComputing time %f\n\n',t)
-    fflush(stdout);
     if isTimeDBC
         DBC_InTime(t)
     end
@@ -144,8 +138,7 @@ while ( t < tf )
     % Newton start here
     newtonIter = 1;
     while ( newtonIter <= maxNumIter )
-        fprintf('  Computing iteration %d\n\n',newtonIter)
-        fflush(stdout);
+        fprintf('  Computing iteration %d\n',newtonIter)
         % ===========================
         % assembling stiffness matrix
         % ===========================
@@ -178,7 +171,6 @@ while ( t < tf )
         fprintf('\n')
         fprintf('Solving system of equations\n')
         fprintf('\n')
-        fflush(stdout);
         M = sparse(irow,icol,K,neq,neq);
         F = M\F;
         % assign solution
@@ -193,18 +185,15 @@ while ( t < tf )
         newtonIter = newtonIter + 1;
         % compute residual norm using new values
         normF = computeF();
-        fprintf('  Norm of residual: %g\n', normF)
-        fflush(stdout);
+        fprintf('  Norm of residual: %g\n\n', normF)
         if normF < Tolerance
             fprintf('  Solution converged!\n')
-            fflush(stdout);
             break
         end
     end % newtonIter
     % now compute phases
     fprintf('\n')
-    fprintf('Computing phases\n')
-    fflush(stdout);
+    fprintf('Computing phases\n\n')
     phaseTransformation(dt)
     if mod(counter,nts) == 0
         count1 = count1 + 1;

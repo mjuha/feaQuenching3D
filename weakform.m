@@ -16,7 +16,8 @@ w = 1/6;
 
 % get material properties
 %prop = cell2mat(MAT(matNum));
-prop = MAT(matNum,:);
+% only one material
+prop = MAT(1,:);
 
 ke = zeros(4,4);
 me = zeros(4,4);
