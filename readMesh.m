@@ -95,6 +95,7 @@ fprintf('Preparing data structures and printing initial mesh\n')
 fprintf('************************\n')
 fprintf('%s %d\n','Number of nodes     ......... ',nn)
 fprintf('%s %d\n','Number of elements  ......... ',nel)
+fflush(stdout);
 %parseData(DBCSet, NBCSet, PFCSet, nodeSet, sideSet)
 
 
